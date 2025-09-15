@@ -7,7 +7,7 @@ import {
   verifyOtp,
 } from "../utils/auth.helper";
 import prisma from "../../../../packages/libs/prisma";
-import { ValidationError } from "../../../../packages/error-handler";
+import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import bcrypt from "bcryptjs";
 
 // Register a new User
@@ -72,3 +72,33 @@ export const verifyUser = async (
     return next(error);
   }
 };
+
+//login user
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(new ValidationError("Email and Password are required"));
+    }
+
+    const user = await prisma.users.findUnique({ where: { email } });
+
+    if (!user) {
+      return next(new AuthError("User does not exist!"));
+    }
+
+    // verify password
+    const isMatch = await bcrypt.compare(password, user.password!);
+    if (!isMatch) {
+      return next(new AuthError("Invalid Email or password"))
+    }
+  }
+
+  // Generate access and refresh token 
+
+
+  catch (error) {
+    return next(error);
+  }
+}
