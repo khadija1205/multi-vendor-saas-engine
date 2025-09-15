@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import {
   checkOtpRestrictions,
+  handleForgotPassword,
   sendOtp,
   trackOtpRequests,
   validateRegistrationData,
@@ -129,4 +130,10 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
   catch (error) {
     return next(error);
   }
+}
+
+
+// user forgot password
+export const userForgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  await handleForgotPassword(req, res, next, 'user');
 }
