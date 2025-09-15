@@ -21,13 +21,10 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "example": "khadija"
+                  "example": "any"
                 },
                 "email": {
-                  "example": "khadijac101@gmail.com"
-                },
-                "password": {
-                  "example": "12345"
+                  "example": "any"
                 }
               }
             }
@@ -36,6 +33,39 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/verify-user": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "otp": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           }
         }
       }
