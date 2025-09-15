@@ -8,11 +8,9 @@
   },
   "host": "localhost:6001",
   "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
-    "/user-registration": {
+    "/api/user-registration": {
       "post": {
         "description": "",
         "parameters": [
@@ -23,10 +21,13 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "example": "any"
+                  "example": "khadija"
                 },
                 "email": {
-                  "example": "any"
+                  "example": "khadijac101@gmail.com"
+                },
+                "password": {
+                  "example": "12345"
                 }
               }
             }
