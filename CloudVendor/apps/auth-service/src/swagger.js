@@ -1,13 +1,14 @@
-import swaggerAutogen from 'swagger-autogen';
+import swaggerAutogen from "swagger-autogen";
 
 const doc = {
-    info: {
-        title: "Auth-Service API",
-        desciption: "Automatically generated Swagger docs",
-        version: "1.0.0",
-    },
-    host: "localhost:6001",
-    schemes: ["http"],
+  info: {
+    title: "Auth-Service API",
+    desciption: "Automatically generated Swagger docs",
+    version: "1.0.0",
+  },
+  host: "localhost:6001",
+  basePath: "/api",
+  schemes: ["http"],
 };
 
 const outputFile = "./swagger-output.json";
