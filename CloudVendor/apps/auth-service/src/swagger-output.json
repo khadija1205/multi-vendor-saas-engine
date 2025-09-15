@@ -7,10 +7,12 @@
     "description": ""
   },
   "host": "localhost:6001",
-  "basePath": "/",
-  "schemes": ["http"],
+  "basePath": "/api",
+  "schemes": [
+    "http"
+  ],
   "paths": {
-    "/api/user-registration": {
+    "/user-registration": {
       "post": {
         "description": "",
         "parameters": [
@@ -37,7 +39,7 @@
         }
       }
     },
-    "/api/verify-user": {
+    "/verify-user": {
       "post": {
         "description": "",
         "parameters": [
@@ -66,6 +68,33 @@
         "responses": {
           "201": {
             "description": "Created"
+          }
+        }
+      }
+    },
+    "/login-user": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
