@@ -9,6 +9,8 @@ import {
 import prisma from "../../../../packages/libs/prisma";
 import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
+import { setCookie } from "../utils/cookies/setCookie";
 
 // Register a new User
 export const userRegistration = async (
@@ -91,12 +93,38 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     // verify password
     const isMatch = await bcrypt.compare(password, user.password!);
     if (!isMatch) {
-      return next(new AuthError("Invalid Email or password"))
+      return next(new AuthError("Invalid Email or password"));
     }
+
+    // Generate access and refresh token
+    const accessToken = jwt.sign(
+      { id: user.id, role: "user" },
+      process.env.ACCESS_TOKEN_SECRET as string,
+      {
+        expiresIn: "15m",
+      }
+    );
+
+    // Generate access and refresh token
+    const refeshToken = jwt.sign(
+      { id: user.id, role: "user" },
+      process.env.REFRESH_TOKEN_SECRET as string,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+
+    // store the refresh and access token in an httpOnly secure cookie
+    setCookie(res, "refresh_token", refeshToken);
+    setCookie(res, "access_token", accessToken);
+
+
+    res.status(200).json({
+      message: "Login successful!",
+      user: {id:user.id, email: user.email, name:user.name}
+    })
   }
-
-  // Generate access and refresh token 
-
 
   catch (error) {
     return next(error);
