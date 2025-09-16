@@ -5,12 +5,13 @@ import {
   sendOtp,
   trackOtpRequests,
   validateRegistrationData,
+  verifyForgotPasswordOtp,
   verifyOtp,
 } from "../utils/auth.helper";
 import prisma from "../../../../packages/libs/prisma";
 import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import { setCookie } from "../utils/cookies/setCookie";
 
 // Register a new User
@@ -77,7 +78,11 @@ export const verifyUser = async (
 };
 
 //login user
-export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
 
@@ -115,29 +120,38 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       }
     );
 
-
     // store the refresh and access token in an httpOnly secure cookie
     setCookie(res, "refresh_token", refeshToken);
     setCookie(res, "access_token", accessToken);
 
-
     res.status(200).json({
       message: "Login successful!",
-      user: {id:user.id, email: user.email, name:user.name}
-    })
+      user: { id: user.id, email: user.email, name: user.name },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// user forgot password
+export const userForgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await handleForgotPassword(req, res, next, "user");
+};
+
+// Verify forgot password OTP
+export const verifyUserForgotPassword = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    await verifyForgotPasswordOtp(req, res, next);
   }
 
   catch (error) {
     return next(error);
   }
 }
-
-
-// user forgot password
-export const userForgotPassword = async (req: Request, res: Response, next: NextFunction) => {
-  await handleForgotPassword(req, res, next, 'user');
-}
-
 
 
 // Reset user password
@@ -162,7 +176,9 @@ export const resetUserPassword = async (
     const isSamePassword = await bcrypt.compare(newPassword, user.password!);
 
     if (isSamePassword) {
-      return next(new ValidationError("New password cannot be same as the old password"));
+      return next(
+        new ValidationError("New password cannot be same as the old password")
+      );
     }
 
     // hash the new password
@@ -173,13 +189,10 @@ export const resetUserPassword = async (
       data: { password: hashedPassword },
     });
 
-
     res.status(200).json({
-      message: "Password reset successfully"
+      message: "Password reset successfully",
     });
-
-  }
-  catch (error) {
+  } catch (error) {
     return next(error);
   }
 };
