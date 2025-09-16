@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { ValidationError } from "../../../../packages/error-handler";
-import { Request, Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import redis from "../../../../packages/libs/redis";
 import { sendEmail } from "./sendMail";
 import prisma from "../../../../packages/libs/prisma";
@@ -114,7 +114,12 @@ export const verifyOtp = async (
   await redis.del(`otp:${email}`, failedAttemptsKey);
 };
 
-export const handleForgotPassword = async (req: Request, res: Response, next: NextFunction, userType: "user" | "seller") => {
+export const handleForgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  userType: "user" | "seller"
+) => {
   try {
     const { email } = req.body;
 
@@ -123,8 +128,10 @@ export const handleForgotPassword = async (req: Request, res: Response, next: Ne
     }
 
     // Find the user/seller in DB
-    const user = userType == 'user' && await prisma.users.findUnique({ where: { email } })
-    
+    const user =
+      userType == "user" &&
+      (await prisma.users.findUnique({ where: { email } }));
+
     if (!user) {
       throw new ValidationError(`${userType} not found!`);
     }
@@ -135,14 +142,31 @@ export const handleForgotPassword = async (req: Request, res: Response, next: Ne
 
     // Generate OTP and send Email
     await sendOtp(email, user.name, "forgot-password-user-mail");
-    
 
     res.status(200).json({
-      message: "OTP sent to email. Please verify your account"
+      message: "OTP sent to email. Please verify your account",
     });
-
-  }
-  catch (error) {
+  } catch (error) {
     return next(error);
+  }
+};
+
+
+export const verifyForgotPasswordOtp = async(req:Request,res:Response,next:NextFunction) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      throw new ValidationError("Email and OTP are required");
+    }
+
+    await verifyOtp(email, otp, next);
+
+    res.status(200).json({
+      message: "OTP verfied.You can now reset your password"
+    });
+  }
+
+  catch (error) {
+    
   }
 }
